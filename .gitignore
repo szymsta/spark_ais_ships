@@ -1,1 +1,3 @@
 ais_decoded_message_time.csv
+__pycache__/
+*.pyc
