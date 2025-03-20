@@ -10,9 +10,10 @@ class LoadData:
 
     def __init__(self, spark_session: SparkSession):
         """
-        Initializes the LoadData object.
+        Initializes the LoadData object with a Spark session.
 
-        :param spark_session: An instance of SparkSession to handle data operations.
+        Args:
+            spark_session (SparkSession): An instance of SparkSession to perform data operations.
         """
         self.spark_session = spark_session
     
@@ -26,7 +27,8 @@ class LoadData:
         - `inferSchema=True`: Automatically infers column data types.
         - `delimiter=","`: Uses a comma as the column separator.
 
-        :return: A DataFrame containing the loaded dataset.
+        Returns:
+            DataFrame: A DataFrame containing the loaded dataset.
         """
         return(self.spark_session.read.format("csv")
                 .options(header=True, inferSchema=True, delimiter=",")
