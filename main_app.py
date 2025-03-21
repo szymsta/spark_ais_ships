@@ -3,6 +3,7 @@ from pyspark.sql import SparkSession
 
 # Import internal modules
 from load_data.data_loader import LoadData
+from clear_data.data_cleaner import CleanData
 
 
 def main():
@@ -21,6 +22,7 @@ def main():
     # Initialize modules
     try:
         loader = LoadData(spark)
+        cleaner = CleanData(spark)
     
     except Exception as e:
         # Handle errors during data loading or cleaning
@@ -31,11 +33,18 @@ def main():
         return
 
 
-    # Load data
+    # Load and clean data
     try:
         print("Loading data...")
+        # Load the data using the loader module and cache it for better performance
         ais_df = loader.load_dataset()
-        ais_df.show()
+
+        print("Cleaning data...")
+        # Clean the loaded data using the cleaner module
+        ais_clean_df = cleaner.clean_dataset(ais_df)
+
+        # Notify that data has been processed
+        print("Data loaded and cleaned successfully.")
     
     except Exception as e:
         # Handle errors during data loading or cleaning
