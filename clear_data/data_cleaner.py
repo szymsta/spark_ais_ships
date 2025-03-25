@@ -73,17 +73,14 @@ class CleanData:
         if self.timestamp_column in df.columns:
             df = df.withColumn(self.timestamp_column, to_timestamp(col(self.timestamp_column), self.timestamp_format))
         
-        # Step 3: Update the DataFrame with the transformed schema
-        df = df.select(*change_schema)
-
-        # Step 4: Apply multiple filters in one step for better performance
-        df = df.filter(
-            (col("msg_type").isNotNull()) &                 # Remove rows without msg_type
-            (col("lon") >= -180) & (col("lon") <= 180) &    # Valid longitude range
-            (col("lat") >= -90) & (col("lat") <= 90) &      # Valid latitude range
-            (col("speed") >= 0) & (col("speed") < 102.2) &  # Valid speed range (0 ≤ speed < 102.2)
-            (col("course") >= 0) & (col("course") <= 360)   # Valid course range (0 ≤ course ≤ 360)
+        # Step 3: Apply column transformations and filters
+        df = df.select(*change_schema).filter(
+                                    (col("msg_type").isNotNull()) &                 # Remove rows without msg_type
+                                    (col("lon") >= -180) & (col("lon") <= 180) &    # Valid longitude range
+                                    (col("lat") >= -90) & (col("lat") <= 90) &      # Valid latitude range
+                                    (col("speed") >= 0) & (col("speed") < 102.2) &  # Valid speed range (0 ≤ speed < 102.2)
+                                    (col("course") >= 0) & (col("course") <= 360)   # Valid course range (0 ≤ course ≤ 360)
         )
 
-        # Step 5: Return the cleaned and transformed DataFrame
+        # Step 4: Return the cleaned and transformed DataFrame
         return df
