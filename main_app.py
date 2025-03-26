@@ -1,9 +1,18 @@
 # # Import libraries
 from pyspark.sql import SparkSession
+import logging
 
 # Import internal modules
 from load_data.data_loader import LoadData
 from clear_data.data_cleaner import CleanData
+
+
+# Configure logging
+logging.basicConfig(
+    level=logging.INFO,    # Set the logging level to INFO 
+    format='%(asctime)s - %(levelname)s - %(message)s', # Define the format for log messages
+    handlers=[logging.FileHandler("spark_process.log"), logging.StreamHandler()]  # Set up two handlers: to a file and to the console
+)
 
 
 def main():
@@ -16,7 +25,7 @@ def main():
         .getOrCreate()                      # Get or create a Spark session
         )
 
-    print("Spark session initialized.")
+    logging.info("Spark session initialized.")
 
 
     # Initialize modules
@@ -26,7 +35,7 @@ def main():
     
     except Exception as e:
         # Handle errors during data loading or cleaning
-        print(f"Error initializing modules: {e}")
+        logging.error(f"Error initializing modules: {e}")
 
         # Stop Spark session if modules fail to initialize
         spark.stop()                                
@@ -35,20 +44,20 @@ def main():
 
     # Load and clean data
     try:
-        print("Loading data...")
+        logging.info("Loading data...")
         # Load the data using the loader module and cache it for better performance
         ais_df = loader.load_dataset()
 
-        print("Cleaning data...")
+        logging.info("Cleaning data...")
         # Clean the loaded data using the cleaner module
         ais_clean_df = cleaner.clean_dataset(ais_df)
 
         # Notify that data has been processed
-        print("Data loaded and cleaned successfully.")
+        logging.info("Data loaded and cleaned successfully.")
     
     except Exception as e:
         # Handle errors during data loading or cleaning
-        print(f"Error during data loading/cleaning: {e}")
+        logging.error(f"Error initializing modules: {e}")
 
         # Stop Spark session if modules fail to initialize
         spark.stop()    
@@ -56,4 +65,5 @@ def main():
 
 
 if __name__ == "__main__":
+    logging.info("Starting AIS data processing...")
     main()
