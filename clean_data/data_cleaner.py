@@ -12,9 +12,25 @@ class CleanData:
      Attributes:
         spark_session (SparkSession): The Spark session to be used for DataFrame operations.
         column_types (dict): A dictionary mapping column names to their desired data types.
-        timestamp_column (str): The name of the column containing timestamp data.
         timestamp_format (str): The format string for parsing the timestamp column.
+
+    Constants:
+        LATITUDE (str): The column name for latitude.
+        LONGITUDE (str): The column name for longitude.
+        SPEED (str): The column name for speed.
+        COURSE (str): The column name for course.
+        MESSAGE_TYPE (str): The column name for the message type.
+        MMSI (str): The column name for the Maritime Mobile Service Identity.
+        TIMESTAMP (str): The column name for timestamp data.
     """
+
+    LATITUDE = "lat"
+    LONGITUDE = "lon"
+    SPEED = "speed"
+    COURSE = "course"
+    MESSAGE_TYPE = "msg_type"
+    MMSI = "mmsi"
+    TIMESTAMP = "Timestamp"
 
     def __init__(self, spark_session: SparkSession):
         """
@@ -27,16 +43,15 @@ class CleanData:
 
         # Dictionary specifying the desired column types for transformation
         self.column_types = {
-            "msg_type": IntegerType(),
-            "mmsi": IntegerType(),
-            "lon": DoubleType(),
-            "lat": DoubleType(),
-            "speed": DoubleType(),
-            "course": DoubleType(),
+            self.MESSAGE_TYPE: IntegerType(),
+            self.MMSI: IntegerType(),
+            self.LONGITUDE: DoubleType(),
+            self.LATITUDE: DoubleType(),
+            self.SPEED: DoubleType(),
+            self.COURSE: DoubleType(),
         }
 
-        # Column and format for timestamp conversion
-        self.timestamp_column = "Timestamp"
+        # Format for timestamp conversion
         self.timestamp_format = "dd.MM.yyyy HH:mm:ss.SSS"
     
 
@@ -70,16 +85,16 @@ class CleanData:
         ]
 
         # Step 2: Convert the 'Timestamp' column to TimestampType if it exists in the DataFrame
-        if self.timestamp_column in df.columns:
-            df = df.withColumn(self.timestamp_column, to_timestamp(col(self.timestamp_column), self.timestamp_format))
+        if self.TIMESTAMP in df.columns:
+            df = df.withColumn(self.TIMESTAMP, to_timestamp(col(self.TIMESTAMP), self.timestamp_format))
         
         # Step 3: Apply column transformations and filters
         df = df.select(*change_schema).filter(
-                                    (col("msg_type").isNotNull()) &                 # Remove rows without msg_type
-                                    (col("lon") >= -180) & (col("lon") <= 180) &    # Valid longitude range
-                                    (col("lat") >= -90) & (col("lat") <= 90) &      # Valid latitude range
-                                    (col("speed") >= 0) & (col("speed") < 102.2) &  # Valid speed range (0 ≤ speed < 102.2)
-                                    (col("course") >= 0) & (col("course") <= 360)   # Valid course range (0 ≤ course ≤ 360)
+                                    (col(self.MESSAGE_TYPE).isNotNull()) &                          # Remove rows without msg_type
+                                    (col(self.LONGITUDE) >= -180) & (col(self.LONGITUDE) <= 180) &  # Valid longitude range
+                                    (col(self.LATITUDE) >= -90) & (col(self.LATITUDE) <= 90) &      # Valid latitude range
+                                    (col(self.SPEED) >= 0) & (col(self.SPEED) < 102.2) &            # Valid speed range (0 ≤ speed < 102.2)
+                                    (col(self.COURSE) >= 0) & (col(self.COURSE) <= 360)             # Valid course range (0 ≤ course ≤ 360)
         )
 
         # Step 4: Return the cleaned and transformed DataFrame
