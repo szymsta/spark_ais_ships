@@ -2,3 +2,4 @@ ais_decoded_message_time.csv
 __pycache__/
 *.pyc
 spark_process.log
+ships_map.html

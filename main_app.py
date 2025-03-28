@@ -1,10 +1,12 @@
-# # Import libraries
+# Import libraries
 from pyspark.sql import SparkSession
 import logging
+import webbrowser
 
 # Import internal modules
 from load_data.data_loader import LoadData
 from clean_data.data_cleaner import CleanData
+from visualize_data.data_visualization import VisualizeData
 
 
 # Configure logging
@@ -32,6 +34,7 @@ def main():
     try:
         loader = LoadData(spark)
         cleaner = CleanData(spark)
+        visualizer = VisualizeData(spark)
     
     except Exception as e:
         # Handle errors during data loading or cleaning
@@ -57,6 +60,31 @@ def main():
     
     except Exception as e:
         # Handle errors during data loading or cleaning
+        logging.error(f"Error initializing modules: {e}")
+
+        # Stop Spark session if modules fail to initialize
+        spark.stop()    
+        return
+    
+
+    # Visualize data on map
+    try:
+        logging.info("Loading map...")
+        # Create clean df with ships data
+        ships_map = visualizer.ships_map(ais_clean_df)
+
+        # Save the map to an HTML file
+        map_path = "ships_map.html"
+        ships_map.write_html(map_path)
+        
+        # Open map in default browser
+        webbrowser.open(map_path)
+
+        # Notify that map has been open in browser
+        logging.info("The ship map has been successfully loaded and opened in browser")
+
+    except Exception as e:
+        # Handle errors during map visualization
         logging.error(f"Error initializing modules: {e}")
 
         # Stop Spark session if modules fail to initialize
