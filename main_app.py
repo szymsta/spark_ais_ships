@@ -4,7 +4,7 @@ import logging
 
 # Import internal modules
 from load_data.data_loader import LoadData
-from clear_data.data_cleaner import CleanData
+from clean_data.data_cleaner import CleanData
 
 
 # Configure logging
