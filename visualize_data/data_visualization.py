@@ -35,15 +35,15 @@ class VisualizeData:
             go.Figure: A Plotly `go.Figure` object representing the ship location map.
         """
         # Step 1: Convert Spark DataFrame to Pandas DataFrame
-        ships_map = df.toPandas()
+        ships_map = df.select("mmsi", "lon", "lat").toPandas()
 
         # Step 2: Create the map using Plotly Express and layout with OpenStreetMap style
         ships_map = (px.scatter_mapbox(ships_map,
                                     lat="lat",
                                     lon="lon",
                                     hover_name="mmsi",
-                                    zoom=12,
-                                    height=1000)
+                                    zoom=5,
+                                    height=5000)
                                     .update_layout(mapbox_style="open-street-map")
         )
 
