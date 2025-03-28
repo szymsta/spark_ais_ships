@@ -1,14 +1,22 @@
 from pyspark.sql import SparkSession, DataFrame
 import plotly.express as px
 import plotly.graph_objects as go
-import pandas as pd
 
 
 class VisualizeData:
     """
     This class uses Plotly to create interactive maps and needs a SparkSession to handle large datasets.
     The `ships_map` method shows the locations of ships based on their latitude, longitude, and MMSI (Maritime Mobile Service Identity) numbers.
+
+    Attributes:
+    LATITUDE (str): The column name for the latitude of the ships.
+    LONGITUDE (str): The column name for the longitude of the ships.
+    MMSI (str): The column name for the Maritime Mobile Service Identity of the ships.
     """
+
+    LATITUDE = "lat"
+    LONGITUDE = "lon"
+    MMSI = "mmsi"
 
     def __init__(self, spark_session: SparkSession):
         """
@@ -35,13 +43,13 @@ class VisualizeData:
             go.Figure: A Plotly `go.Figure` object representing the ship location map.
         """
         # Step 1: Convert Spark DataFrame to Pandas DataFrame
-        ships_map = df.select("mmsi", "lon", "lat").toPandas()
+        ships_map = df.select(self.MMSI, self.LONGITUDE, self.LATITUDE).toPandas()
 
         # Step 2: Create the map using Plotly Express and layout with OpenStreetMap style
         ships_map = (px.scatter_mapbox(ships_map,
-                                    lat="lat",
-                                    lon="lon",
-                                    hover_name="mmsi",
+                                    lat=self.LATITUDE,
+                                    lon=self.LONGITUDE,
+                                    hover_name=self.MMSI,
                                     zoom=5,
                                     height=5000)
                                     .update_layout(mapbox_style="open-street-map")
@@ -50,4 +58,3 @@ class VisualizeData:
         # Step 3: Return the map (go.Figure)
         return ships_map
     
-
