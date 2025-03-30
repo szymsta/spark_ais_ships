@@ -7,6 +7,7 @@ import webbrowser
 from load_data.data_loader import LoadData
 from clean_data.data_cleaner import CleanData
 from visualize_data.data_visualization import VisualizeData
+from analyse_data.data_analyzer import AnalyzeData
 
 
 # Configure logging
@@ -35,6 +36,7 @@ def main():
         loader = LoadData(spark)
         cleaner = CleanData(spark)
         visualizer = VisualizeData(spark)
+        analyzer = AnalyzeData(spark)
     
     except Exception as e:
         # Handle errors during data loading or cleaning
@@ -85,6 +87,27 @@ def main():
 
     except Exception as e:
         # Handle errors during map visualization
+        logging.error(f"Error initializing modules: {e}")
+
+        # Stop Spark session if modules fail to initialize
+        spark.stop()    
+        return
+    
+
+    # Analyze dynamic data
+    try:
+        logging.info("Filtering df...")
+        # Create df with dynamic data
+        dynamic_data = analyzer.calculate_dynamic_data(ais_clean_df)
+
+        # Show dynamic data
+        dynamic_data.show()
+
+        # Notify that df with dynamic data has been created
+        logging.info("DatFrame with dynamic data created and showed")
+
+    except Exception as e:
+        # Handle errors during process
         logging.error(f"Error initializing modules: {e}")
 
         # Stop Spark session if modules fail to initialize
