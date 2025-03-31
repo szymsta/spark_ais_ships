@@ -1,6 +1,6 @@
 from pyspark.sql import SparkSession, DataFrame
 from pyspark.sql.functions import col, to_timestamp
-from pyspark.sql.types import DoubleType, IntegerType, TimestampType
+from pyspark.sql.types import DoubleType, IntegerType, TimestampType, StringType
 
 class CleanData:
     """
@@ -22,6 +22,8 @@ class CleanData:
         MESSAGE_TYPE (str): The column name for the message type.
         MMSI (str): The column name for the Maritime Mobile Service Identity.
         TIMESTAMP (str): The column name for timestamp data.
+        MID (str): The column name for the Maritime Identification Digits.
+        COUNTRY (str): The column name for the country corresponding to the MID.
     """
 
     LATITUDE = "lat"
@@ -31,6 +33,8 @@ class CleanData:
     MESSAGE_TYPE = "msg_type"
     MMSI = "mmsi"
     TIMESTAMP = "Timestamp"
+    MID = "mid"
+    COUNTRY = "country"
 
     def __init__(self, spark_session: SparkSession):
         """
@@ -49,6 +53,8 @@ class CleanData:
             self.LATITUDE: DoubleType(),
             self.SPEED: DoubleType(),
             self.COURSE: DoubleType(),
+            self.MID: IntegerType(),
+            self.COUNTRY: StringType(),
         }
 
         # Format for timestamp conversion
