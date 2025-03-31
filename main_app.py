@@ -51,7 +51,7 @@ def main():
     try:
         logging.info("Loading data...")
         # Load the data using the loader module and cache it for better performance
-        ais_df = loader.load_dataset()
+        ais_df = loader.join_datasets().cache()
 
         logging.info("Cleaning data...")
         # Clean the loaded data using the cleaner module
