@@ -1,5 +1,6 @@
-from pyspark.sql import SparkSession, DataFrame
-from pyspark.sql.functions import col
+from pyspark.sql import SparkSession, DataFrame, Window
+from pyspark.sql.functions import col, first
+from haversine import haversine, Unit
 
 class AnalyzeData:
     """
@@ -20,6 +21,10 @@ class AnalyzeData:
     MESSAGE_TYPE = "msg_type"
     COUNTRY = "country"
     MMSI = "mmsi"
+    TIMESTAMP = "Timestamp"
+    LATITUDE = "lat"
+    LONGITUDE = "lon"
+    DISTANCE = "timestamp_for_distance"
 
 
     def __init__(self, spark_session: SparkSession):
@@ -66,3 +71,15 @@ class AnalyzeData:
                 .count()
                 .sort("count", ascending=False)
         )
+    
+    def calculate_distance(self, df: DataFrame) -> DataFrame:
+
+        window = Window.partitionBy(self.MMSI).orderBy(col(self.TIMESTAMP))
+        window_2 = Window.partitionBy(self.MMSI).orderBy(col(self.TIMESTAMP).desc())
+
+        df_1 = (df.withColumn(self.DISTANCE, first(self.TIMESTAMP).over(window))
+                    .filter(col(self.TIMESTAMP) == col(self.DISTANCE)))
+        df_2 = (df.withColumn(self.DISTANCE, first(self.TIMESTAMP).over(window_2))
+                    .filter(col(self.TIMESTAMP) == col(self.DISTANCE)))
+             
+        union_dfs = df_1.union(df_2)
