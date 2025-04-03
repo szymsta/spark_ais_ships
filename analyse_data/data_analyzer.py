@@ -1,5 +1,5 @@
 from pyspark.sql import SparkSession, DataFrame, Window
-from pyspark.sql.functions import col, first, udf, round
+from pyspark.sql.functions import col, first, udf, round, avg, desc
 from pyspark.sql.types import DoubleType
 from haversine import haversine, Unit
 
@@ -14,6 +14,7 @@ class AnalyzeData:
         spark_session (SparkSession): The Spark session to be used for DataFrame operations.
     
     Constants:
+        KNOTS_TO_KMH (double): Conversion factor from knots to kilometers per hour (1 knot = 1.852 km/h).
         DYNAMIC_MSG_TYPES (list): A list containing the valid message types to filter by.
         MESSAGE_TYPE (str): The column name for the message type.
         COUNTRY (str): The column name for the country.
@@ -21,13 +22,16 @@ class AnalyzeData:
         TIMESTAMP (str): The column name for the timestamp.
         LATITUDE (str): The column name for latitude.
         LONGITUDE (str): The column name for longitude.
+        SPEED (str): The column name for speed.
         TIMESTAMP_FOR_POS (str): The column name for the first timestamp used in distance calculation.
         SECOND_TIMESTAMP (str): The column name for the second timestamp used in distance calculation.
         SECOND_LAT (str): The column name for the second latitude used in distance calculation.
         SECOND_LON (str): The column name for the second longitude used in distance calculation.
         DISTANCE (str): The column name for the calculated distance between positions at different timestamps.
+        SPEED_AVG (str): The column name for the calculated average speed in kilometers per hour.
     """
 
+    KNOTS_TO_KMH = 1.852    # 1[kn] = 1.852 [km/h]
     DYNAMIC_MSG_TYPES : list[int] = [1, 2, 3, 18, 19]
     MESSAGE_TYPE = "msg_type"
     COUNTRY = "country"
@@ -35,11 +39,13 @@ class AnalyzeData:
     TIMESTAMP = "Timestamp"
     LATITUDE = "lat"
     LONGITUDE = "lon"
+    SPEED = "speed"
     TIMESTAMP_FOR_POS = "timestamp_for_pos"
     SECOND_TIMESTAMP = "second_timestamp"
     SECOND_LAT = "second_lat"
     SECOND_LON = "second_lon"
     DISTANCE = "distnce"
+    SPEED_AVG = "speed_average [km/h]"
 
 
     # Define the static method for haversine UDF here
@@ -148,3 +154,22 @@ class AnalyzeData:
 
         # Step 6: Return the resulting DataFrame with the calculated distances
         return dfs_distance
+
+
+    def calculate_avg_speed(self, df: DataFrame) -> DataFrame:
+        """
+        Calculates the average speed of each ship (MMSI) in kilometers per hour (km/h) 
+        using speed values stored in knots.
+
+        Args:
+            df (DataFrame): The DataFrame containing the data to be analyzed, which should include 
+                            columns for MMSI and speed.
+
+        Returns:
+            DataFrame: A DataFrame containing the MMSI and the calculated average speed in km/h.
+        """
+        return(df.filter(col(self.SPEED).isNotNull())
+                .groupBy(col(self.MMSI))
+                .agg(round(avg(col(self.SPEED) * self.KNOTS_TO_KMH), 2).alias(self.SPEED_AVG))
+                .orderBy(col(self.SPEED_AVG), ascending=False)
+        )
