@@ -2,12 +2,19 @@
 from pyspark.sql import SparkSession
 import logging
 import webbrowser
+import os
+import sys
 
 # Import internal modules
 from load_data.data_loader import LoadData
 from clean_data.data_cleaner import CleanData
 from visualize_data.data_visualization import VisualizeData
 from analyse_data.data_analyzer import AnalyzeData
+
+
+# Set the same Python interpreter for both PySpark and the driver to avoid compatibility issues.
+os.environ['PYSPARK_PYTHON'] = sys.executable
+os.environ['PYSPARK_DRIVER_PYTHON'] = sys.executable
 
 
 # Configure logging
@@ -51,7 +58,7 @@ def main():
     try:
         logging.info("Loading data...")
         # Load the data using the loader module and cache it for better performance
-        ais_df = loader.join_datasets().cache()
+        ais_df = loader.join_datasets()
 
         logging.info("Cleaning data...")
         # Clean the loaded data using the cleaner module
@@ -94,17 +101,21 @@ def main():
         return
     
 
-    # Analyze dynamic data
+    # Analyze data
     try:
         logging.info("Filtering df...")
-        # Create df with dynamic data
+        # Create a DataFrame with dynamic data
         dynamic_data = analyzer.calculate_dynamic_data(ais_clean_df)
 
-        # Show dynamic data
-        dynamic_data.show()
+        # Notify that the DataFrame with dynamic data has been created
+        logging.info("DatFrame with dynamic data created")
 
-        # Notify that df with dynamic data has been created
-        logging.info("DatFrame with dynamic data created and showed")
+        # Create a DataFrame with distances
+        logging.info("Calculating distances...")
+        distance = analyzer.calculate_distance(dynamic_data)
+
+        # Notify that the DataFrame with distances has been created
+        logging.info("DatFrame with distances created")
 
     except Exception as e:
         # Handle errors during process
