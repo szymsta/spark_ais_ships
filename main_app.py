@@ -103,19 +103,20 @@ def main():
 
     # Analyze data
     try:
-        logging.info("Filtering df...")
         # Create a DataFrame with dynamic data
+        logging.info("Filtering df...")
         dynamic_data = analyzer.calculate_dynamic_data(ais_clean_df)
-
-        # Notify that the DataFrame with dynamic data has been created
-        logging.info("DatFrame with dynamic data created")
+        logging.info("DataFrame with dynamic data created")
 
         # Create a DataFrame with distances
         logging.info("Calculating distances...")
         distance = analyzer.calculate_distance(dynamic_data)
+        logging.info("DataFrame with distances created")
 
-        # Notify that the DataFrame with distances has been created
-        logging.info("DatFrame with distances created")
+        # Create a DataFrame with speed average
+        logging.info("Calculating speed average...")
+        speed_avg = analyzer.calculate_avg_speed(dynamic_data)
+        logging.info("DataFrame with speed average created")
 
     except Exception as e:
         # Handle errors during process
