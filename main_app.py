@@ -10,6 +10,7 @@ from load_data.data_loader import LoadData
 from clean_data.data_cleaner import CleanData
 from visualize_data.data_visualization import VisualizeData
 from analyse_data.data_analyzer import AnalyzeData
+from search_data.data_searcher import SearchData
 
 
 # Set the same Python interpreter for both PySpark and the driver to avoid compatibility issues.
@@ -44,6 +45,7 @@ def main():
         cleaner = CleanData(spark)
         visualizer = VisualizeData(spark)
         analyzer = AnalyzeData(spark)
+        searcher = SearchData(spark)
     
     except Exception as e:
         # Handle errors during data loading or cleaning
@@ -76,31 +78,6 @@ def main():
         return
     
 
-    # Visualize data on map
-    try:
-        logging.info("Loading map...")
-        # Create clean df with ships data
-        ships_map = visualizer.ships_map(ais_clean_df)
-
-        # Save the map to an HTML file
-        map_path = "ships_map.html"
-        ships_map.write_html(map_path)
-        
-        # Open map in default browser
-        webbrowser.open(map_path)
-
-        # Notify that map has been open in browser
-        logging.info("The ship map has been successfully loaded and opened in browser")
-
-    except Exception as e:
-        # Handle errors during map visualization
-        logging.error(f"Error initializing modules: {e}")
-
-        # Stop Spark session if modules fail to initialize
-        spark.stop()    
-        return
-    
-
     # Analyze data
     try:
         # Create a DataFrame with dynamic data
@@ -120,6 +97,52 @@ def main():
 
     except Exception as e:
         # Handle errors during process
+        logging.error(f"Error initializing modules: {e}")
+
+        # Stop Spark session if modules fail to initialize
+        spark.stop()    
+        return
+
+
+    # Search Data
+    try:
+        # Create a DataFrame with search MMSI
+        logging.info("Calculating df...")
+        find_mmsi = searcher.search_ship(319205600, dynamic_data)
+        logging.info("DataFrame with provided key_word created")
+
+        # Create a DataFrame with searching by location
+        logging.info("Calculating df...")
+        find_ships_by_location = searcher.search_ships_by_location(57.0, 59.0, 4.0, 5.4, dynamic_data)
+        logging.info("DataFrame with provided locations created")
+
+    except:
+        # Handle errors during process
+        logging.error(f"Error initializing modules: {e}")
+
+        # Stop Spark session if modules fail to initialize
+        spark.stop()    
+        return
+    
+
+    # Visualize data on map
+    try:
+        logging.info("Loading map...")
+        # Create clean df with ships data
+        ships_map = visualizer.ships_map(find_ships_by_location)
+
+        # Save the map to an HTML file
+        map_path = "ships_map.html"
+        ships_map.write_html(map_path)
+        
+        # Open map in default browser
+        webbrowser.open(map_path)
+
+        # Notify that map has been open in browser
+        logging.info("The ship map has been successfully loaded and opened in browser")
+
+    except Exception as e:
+        # Handle errors during map visualization
         logging.error(f"Error initializing modules: {e}")
 
         # Stop Spark session if modules fail to initialize
