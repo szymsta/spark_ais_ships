@@ -10,9 +10,17 @@ class VisualizeData:
     The `ships_map` method shows the locations of ships based on their latitude, longitude, and MMSI (Maritime Mobile Service Identity) numbers.
 
     Attributes:
-    LATITUDE (str): The column name for the latitude of the ships.
-    LONGITUDE (str): The column name for the longitude of the ships.
-    MMSI (str): The column name for the Maritime Mobile Service Identity of the ships.
+        spark_session (SparkSession): The Spark session to be used for DataFrame operations.
+    
+    Constants:
+        LATITUDE (str): The column name for the latitude of the ships.
+        LONGITUDE (str): The column name for the longitude of the ships.
+        MMSI (str): The column name for the Maritime Mobile Service Identity of the ships.
+
+    Configuration:
+        Config.MAP_ZOOM (int): The zoom level for the map.
+        Config.MAP_HEIGHT (int): The height of the map.
+        Config.MAP_STYLE (str): The style of the map.
     """
 
     LATITUDE = "lat"
