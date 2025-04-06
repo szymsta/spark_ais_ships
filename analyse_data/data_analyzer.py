@@ -15,8 +15,6 @@ class AnalyzeData:
         spark_session (SparkSession): The Spark session to be used for DataFrame operations.
     
     Constants:
-        KNOTS_TO_KMH (double): Conversion factor from knots to kilometers per hour (1 knot = 1.852 km/h).
-        DYNAMIC_MSG_TYPES (list): A list containing the valid message types to filter by.
         MESSAGE_TYPE (str): The column name for the message type.
         COUNTRY (str): The column name for the country.
         MMSI (str): The column name for the Maritime Mobile Service Identity (unique ship identifier).
@@ -30,6 +28,11 @@ class AnalyzeData:
         SECOND_LON (str): The column name for the second longitude used in distance calculation.
         DISTANCE (str): The column name for the calculated distance between positions at different timestamps.
         SPEED_AVG (str): The column name for the calculated average speed in kilometers per hour.
+
+    Configuration:
+        Config.DISTANCE_UNIT (Unit): The unit of measurement for distance (e.g., kilometers or miles).
+        Config.SPEED_CONVERSION_FACTOR (float): Conversion factor for speed unit (e.g., from knots to kilometers per hour).
+        Config.DYNAMIC_MSG_TYPES (list): A list containing the valid message types to filter by.
     """
 
     MESSAGE_TYPE = "msg_type"
