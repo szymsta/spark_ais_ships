@@ -41,3 +41,9 @@ class Config:
 
     # Speed conversion factor - data_analyzer.py
     SPEED_CONVERSION_FACTOR = 1.852  # Conversion factor for speed from knots to km/h: 1 knot = 1.852 km/h
+
+
+    # Map visualization parameters - data_visualization.py
+    MAP_ZOOM = 5                    # Default zoom level for the map
+    MAP_HEIGHT = 5000               # Default map height
+    MAP_STYLE = "open-street-map"   # Default map style

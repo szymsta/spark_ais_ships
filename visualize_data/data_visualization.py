@@ -1,6 +1,7 @@
 from pyspark.sql import SparkSession, DataFrame
 import plotly.express as px
 import plotly.graph_objects as go
+from config import Config
 
 
 class VisualizeData:
@@ -50,9 +51,9 @@ class VisualizeData:
                                     lat=self.LATITUDE,
                                     lon=self.LONGITUDE,
                                     hover_name=self.MMSI,
-                                    zoom=5,
-                                    height=5000)
-                                    .update_layout(mapbox_style="open-street-map")
+                                    zoom=Config.MAP_ZOOM,   # Use zoom from Config
+                                    height=Config.MAP_HEIGHT)   # Use height from Config
+                                    .update_layout(mapbox_style=Config.MAP_STYLE) # Use mapbox style from Config
         )
 
         # Step 3: Return the map (go.Figure)
