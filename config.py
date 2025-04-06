@@ -3,6 +3,32 @@ import logging
 from haversine import Unit
 
 class Config:
+    """
+    Configuration class for setting various parameters used across the application.
+
+    This class contains all configuration values for the Spark environment, logging settings,
+    file paths, data loader parameters, distance and speed conversion settings, and map visualization options.
+
+    Constants:
+        PYSPARK_PYTHON (str): Path to the Python interpreter used by PySpark.
+        PYSPARK_DRIVER_PYTHON (str): Path to the Python interpreter used by the PySpark driver.
+        SPARK_APP_NAME (str): The application name for the Spark session.
+        SPARK_MASTER (str): The master URL for the Spark session.
+        LOG_FILE (str): The log file name for logging.
+        LOG_LEVEL (int): The log level to be used (e.g., INFO, DEBUG, ERROR).
+        LOG_FORMAT (str): The format string for log messages.
+        LOG_HANDLERS (list): The handlers for logging output (file and console).
+        MAP_OUTPUT_FILE (str): The output file name and path for the map visualization.
+        FILE_NAMES (list): List of CSV file names to load.
+        FILE_FORMAT (str): The format of the files to be loaded.
+        FILE_OPTIONS (dict): CSV loading options such as header, schema inference, and delimiter.
+        DISTANCE_UNIT (Unit): The unit for measuring distance (e.g., kilometers).
+        DYNAMIC_MSG_TYPES (list): List of message types associated with dynamic data.
+        SPEED_CONVERSION_FACTOR (float): Conversion factor for speed from knots to kilometers per hour.
+        MAP_ZOOM (int): Default zoom level for map visualization.
+        MAP_HEIGHT (int): Default height for map visualization.
+        MAP_STYLE (str): The style of the map visualization (e.g., "open-street-map").
+    """
 
     # PySpark environment configuration - main_app.py
     PYSPARK_PYTHON = sys.executable         # Set the Python interpreter for PySpark
