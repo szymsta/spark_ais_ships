@@ -18,6 +18,9 @@ class Config:
     LOG_FORMAT = "%(asctime)s - %(levelname)s - %(message)s" # Log format string
     LOG_HANDLERS = [logging.FileHandler(LOG_FILE), logging.StreamHandler()] # Default handlers: to a file and to the console
 
+    # map name & path - main_app.py
+    MAP_OUTPUT_FILE = "ships_map.html"
+
 
     # File name configuration - data_loader.py
     FILE_NAMES = ["ais_decoded_message_time.csv", "mid_for_mmsi.csv"]

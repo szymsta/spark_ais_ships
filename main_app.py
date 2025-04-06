@@ -58,12 +58,12 @@ def main():
 
     # Load and clean data
     try:
+        # Load the data using the loader module
         logging.info("Loading data...")
-        # Load the data using the loader module and cache it for better performance
         ais_df = loader.join_datasets()
 
-        logging.info("Cleaning data...")
         # Clean the loaded data using the cleaner module
+        logging.info("Cleaning data...")
         ais_clean_df = cleaner.clean_dataset(ais_df)
 
         # Notify that data has been processed
@@ -127,15 +127,13 @@ def main():
 
     # Visualize data on map
     try:
-        logging.info("Loading map...")
         # Create clean df with ships data
+        logging.info("Loading map...")
         ships_map = visualizer.ships_map(find_ships_by_location)
 
-        # Save the map to an HTML file
-        map_path = "ships_map.html"
+        # Save the map to an HTML file and open in default browser
+        map_path = Config.MAP_OUTPUT_FILE   # Use name & path from Config
         ships_map.write_html(map_path)
-        
-        # Open map in default browser
         webbrowser.open(map_path)
 
         # Notify that map has been open in browser
