@@ -1,5 +1,6 @@
 import sys
 import logging
+from haversine import Unit
 
 class Config:
 
@@ -17,7 +18,8 @@ class Config:
     LOG_FORMAT = "%(asctime)s - %(levelname)s - %(message)s" # Log format string
     LOG_HANDLERS = [logging.FileHandler(LOG_FILE), logging.StreamHandler()] # Default handlers: to a file and to the console
 
-    # File name cnfiguration - data_loader.py
+
+    # File name configuration - data_loader.py
     FILE_NAMES = ["ais_decoded_message_time.csv", "mid_for_mmsi.csv"]
 
     # FIle format - data_loader.py
@@ -29,3 +31,13 @@ class Config:
         "inferSchema": True,
         "delimiter": ","
     }
+
+
+    # Distance unit - data_analyzer.py
+    DISTANCE_UNIT = Unit.KILOMETERS
+
+    # Dynamic data - data_analyzer.py
+    DYNAMIC_MSG_TYPES : list[int] = [1, 2, 3, 18, 19]   # msg_type with dynamic data
+
+    # Speed conversion factor - data_analyzer.py
+    SPEED_CONVERSION_FACTOR = 1.852  # Conversion factor for speed from knots to km/h: 1 knot = 1.852 km/h
