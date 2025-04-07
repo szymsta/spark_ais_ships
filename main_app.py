@@ -26,14 +26,14 @@ logging.basicConfig(
 )
 
 
-# Initialize SparkSession outside of main function (using Singleton)
+# Initialize SparkSession (using Singleton)
 spark = SparkSessionSingleton.get_spark_session()
 logging.info("Spark session initialized.")
 
 
 def main():
 
-    # Initialize modules
+    # Initialize data processing modules
     try:
         loader = LoadData(spark)
         cleaner = CleanData(spark)
@@ -50,18 +50,18 @@ def main():
         return
 
 
-    # Load and clean data
+    # Load and clean datasets
     try:
         # Load the data using the loader module
-        logging.info("Loading data...")
+        logging.info("Loading AIS datasets...")
         ais_df = loader.join_datasets()
 
         # Clean the loaded data using the cleaner module
-        logging.info("Cleaning data...")
+        logging.info("Cleaning the dataset...")
         ais_clean_df = cleaner.clean_dataset(ais_df)
 
         # Notify that data has been processed
-        logging.info("Data loaded and cleaned successfully.")
+        logging.info("AIS data loaded and cleaned successfully.")
     
     except Exception as e:
         # Handle errors during data loading or cleaning
@@ -72,21 +72,26 @@ def main():
         return
     
 
-    # Analyze data
+    # Analyze the data
     try:
         # Create a DataFrame with dynamic data
-        logging.info("Filtering df...")
-        dynamic_data = analyzer.calculate_dynamic_data(ais_clean_df)
-        logging.info("DataFrame with dynamic data created")
+        logging.info("Filtering DataFrame...")
+        dynamic_data_df = analyzer.calculate_dynamic_data(ais_clean_df)
+        logging.info("Dynamic data DataFrame created")
+
+        # Create a DataFrame grouped by the country
+        logging.info("Filtering DataFrame...")
+        country_df = analyzer.calculate_dynamic_data(ais_clean_df)
+        logging.info("DataFrame grouped by country flag created")
 
         # Create a DataFrame with distances
-        logging.info("Calculating distances...")
-        distance = analyzer.calculate_distance(dynamic_data)
-        logging.info("DataFrame with distances created")
+        logging.info("Calculating the route distances for the ship...")
+        distance_df = analyzer.calculate_distance(dynamic_data_df)
+        logging.info("Ship's route distances DataFrame created")
 
         # Create a DataFrame with speed average
-        logging.info("Calculating speed average...")
-        speed_avg = analyzer.calculate_avg_speed(dynamic_data)
+        logging.info("Calculating average speed for ships...")
+        speed_avg_df = analyzer.calculate_avg_speed(dynamic_data_df)
         logging.info("DataFrame with speed average created")
 
     except Exception as e:
@@ -100,15 +105,25 @@ def main():
 
     # Search Data
     try:
-        # Create a DataFrame with search MMSI
-        logging.info("Calculating df...")
-        find_mmsi = searcher.search_ship(319205600, dynamic_data)
-        logging.info("DataFrame with provided key_word created")
+        # Create a DataFrame by searching for MMSI (Maritime Mobile Service Identity)
+        logging.info("Searching for MMSI in dynamic data...")
+        find_mmsi_df = searcher.search_ship(319205600, dynamic_data_df)
+        logging.info("DataFrame with provided MMSI number created")
 
-        # Create a DataFrame with searching by location
-        logging.info("Calculating df...")
-        find_ships_by_location = searcher.search_ships_by_location(57.0, 59.0, 4.0, 5.4, dynamic_data)
+        # Create a DataFrame by searching for a list of MMSIs
+        logging.info("Searching for MMSI list in dynamic data...")
+        find_mmsi_list_df = searcher.search_ships([319205600, 257988000], dynamic_data_df)
+        logging.info("DataFrame with provided MMSI list created")
+
+        # Create a DataFrame by searching ships within a specific location range
+        logging.info("Searching ships located within specified geographic range...")
+        find_ships_by_location_df = searcher.search_ships_by_location(57.0, 59.0, 4.0, 5.4, dynamic_data_df)
         logging.info("DataFrame with provided locations created")
+
+        # Create a DataFrame by searching ships by country flag
+        logging.info("Searching ships by country flag...")
+        find_ships_by_country_flag_df = searcher.search_ships_by_country_flag("Poland (Republic of)", dynamic_data_df)
+        logging.info("DataFrame with provided country created")
 
     except:
         # Handle errors during process
@@ -119,11 +134,11 @@ def main():
         return
     
 
-    # Visualize data on map
+    # Visualize data on a map
     try:
-        # Create clean df with ships data
-        logging.info("Loading map...")
-        ships_map = visualizer.ships_map(find_ships_by_location)
+        # Create a clean DataFrame with ships data
+        logging.info("Loading map visualization of ships...")
+        ships_map = visualizer.ships_map(find_ships_by_country_flag_df)
 
         # Save the map to an HTML file and open in default browser
         map_path = Config.MAP_OUTPUT_FILE   # Use name & path from Config
@@ -131,7 +146,7 @@ def main():
         webbrowser.open(map_path)
 
         # Notify that map has been open in browser
-        logging.info("The ship map has been successfully loaded and opened in browser")
+        logging.info("The ship data map has been successfully loaded and opened in the default browser")
 
     except Exception as e:
         # Handle errors during map visualization
