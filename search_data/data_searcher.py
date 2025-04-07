@@ -1,5 +1,5 @@
 from pyspark.sql import SparkSession, DataFrame
-from pyspark.sql.functions import col
+from pyspark.sql.functions import col, lower
 from functools import reduce
 
 
@@ -10,7 +10,8 @@ class SearchData:
     It includes methods for:
         - Searching for ships based on their MMSI.
         - Searching for ships within a list of MMSIs.
-        - Filtering ships within a specified geographical location range (latitude and longitude).
+        - Searching ships within a specified geographical location range (latitude and longitude).
+        - Searching by country flag
 
 
     Attributes:
@@ -20,11 +21,13 @@ class SearchData:
         MMSI (str): The column name for the Maritime Mobile Service Identity (MMSI), which is a unique identifier for ships.
         LATITUDE (str): The column name for latitude in the DataFrame.
         LONGITUDE (str): The column name for longitude in the DataFrame.
+        COUNTRY (str): Column name for the country flag.
     """
 
     MMSI = "mmsi"
     LATITUDE = "lat"
     LONGITUDE = "lon"
+    COUNTRY = "country"
 
     def __init__(self, spark_session: SparkSession):
         """
@@ -99,5 +102,16 @@ class SearchData:
                         (col(self.LONGITUDE).between(lon_min, lon_max)))
 
 
+    def search_ships_by_country_flag(self, country: str, df: DataFrame) -> DataFrame:
+        """
+        Filters the DataFrame for ships registered under a specific country flag.
+        The method performs a case-insensitive search by matching the COUNTRY column with the provided country name.
 
+        Args:
+            country (str): The name of the country (flag state) to search for.
+            df (DataFrame): The DataFrame containing ship data, which must include a COUNTRY column.
 
+        Returns:
+            DataFrame: A DataFrame containing only rows where the COUNTRY column matches (contains) the specified country.
+        """
+        return df.filter(lower(col(self.COUNTRY)).contains(country.lower()))
