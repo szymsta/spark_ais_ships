@@ -3,7 +3,6 @@ from pyspark.sql import SparkSession
 import logging
 import webbrowser
 import os
-import sys
 
 # Import internal modules
 from load_data.data_loader import LoadData
@@ -11,18 +10,19 @@ from clean_data.data_cleaner import CleanData
 from visualize_data.data_visualization import VisualizeData
 from analyse_data.data_analyzer import AnalyzeData
 from search_data.data_searcher import SearchData
+from config import Config
 
 
 # Set the same Python interpreter for both PySpark and the driver to avoid compatibility issues.
-os.environ['PYSPARK_PYTHON'] = sys.executable
-os.environ['PYSPARK_DRIVER_PYTHON'] = sys.executable
+os.environ['PYSPARK_PYTHON'] = Config.PYSPARK_PYTHON
+os.environ['PYSPARK_DRIVER_PYTHON'] = Config.PYSPARK_DRIVER_PYTHON
 
 
 # Configure logging
 logging.basicConfig(
-    level=logging.INFO,    # Set the logging level to INFO 
-    format='%(asctime)s - %(levelname)s - %(message)s', # Define the format for log messages
-    handlers=[logging.FileHandler("spark_process.log"), logging.StreamHandler()]  # Set up two handlers: to a file and to the console
+    level = Config.LOG_LEVEL,       # Logging threshold (e.g., INFO, DEBUG)
+    format = Config.LOG_FORMAT,     # Format for each log message
+    handlers = Config.LOG_HANDLERS  # Output destinations: log file and console
 )
 
 
@@ -31,9 +31,9 @@ def main():
     # Initialize SparkSession.
     spark = (
         SparkSession.builder
-        .appName("spark_ais_ships")         # Set the application name
-        .master("local[*]")                 # Run Spark locally with as many worker threads as there are cores on your machine
-        .getOrCreate()                      # Get or create a Spark session
+        .appName(Config.SPARK_APP_NAME) # Set the application name
+        .master(Config.SPARK_MASTER)    # Run Spark locally with as many worker threads as there are cores on your machine
+        .getOrCreate()                  # Get or create a Spark session
         )
 
     logging.info("Spark session initialized.")
@@ -58,12 +58,12 @@ def main():
 
     # Load and clean data
     try:
+        # Load the data using the loader module
         logging.info("Loading data...")
-        # Load the data using the loader module and cache it for better performance
         ais_df = loader.join_datasets()
 
-        logging.info("Cleaning data...")
         # Clean the loaded data using the cleaner module
+        logging.info("Cleaning data...")
         ais_clean_df = cleaner.clean_dataset(ais_df)
 
         # Notify that data has been processed
@@ -127,15 +127,13 @@ def main():
 
     # Visualize data on map
     try:
-        logging.info("Loading map...")
         # Create clean df with ships data
+        logging.info("Loading map...")
         ships_map = visualizer.ships_map(find_ships_by_location)
 
-        # Save the map to an HTML file
-        map_path = "ships_map.html"
+        # Save the map to an HTML file and open in default browser
+        map_path = Config.MAP_OUTPUT_FILE   # Use name & path from Config
         ships_map.write_html(map_path)
-        
-        # Open map in default browser
         webbrowser.open(map_path)
 
         # Notify that map has been open in browser

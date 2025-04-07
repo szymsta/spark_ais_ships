@@ -2,6 +2,7 @@ from pyspark.sql import SparkSession, DataFrame, Window
 from pyspark.sql.functions import col, first, udf, round, avg, desc
 from pyspark.sql.types import DoubleType
 from haversine import haversine, Unit
+from config import Config
 
 
 class AnalyzeData:
@@ -14,8 +15,6 @@ class AnalyzeData:
         spark_session (SparkSession): The Spark session to be used for DataFrame operations.
     
     Constants:
-        KNOTS_TO_KMH (double): Conversion factor from knots to kilometers per hour (1 knot = 1.852 km/h).
-        DYNAMIC_MSG_TYPES (list): A list containing the valid message types to filter by.
         MESSAGE_TYPE (str): The column name for the message type.
         COUNTRY (str): The column name for the country.
         MMSI (str): The column name for the Maritime Mobile Service Identity (unique ship identifier).
@@ -29,10 +28,13 @@ class AnalyzeData:
         SECOND_LON (str): The column name for the second longitude used in distance calculation.
         DISTANCE (str): The column name for the calculated distance between positions at different timestamps.
         SPEED_AVG (str): The column name for the calculated average speed in kilometers per hour.
+
+    Configuration:
+        Config.DISTANCE_UNIT (Unit): The unit of measurement for distance (e.g., kilometers or miles).
+        Config.SPEED_CONVERSION_FACTOR (float): Conversion factor for speed unit (e.g., from knots to kilometers per hour).
+        Config.DYNAMIC_MSG_TYPES (list): A list containing the valid message types to filter by.
     """
 
-    KNOTS_TO_KMH = 1.852    # 1[kn] = 1.852 [km/h]
-    DYNAMIC_MSG_TYPES : list[int] = [1, 2, 3, 18, 19]
     MESSAGE_TYPE = "msg_type"
     COUNTRY = "country"
     MMSI = "mmsi"
@@ -65,7 +67,7 @@ class AnalyzeData:
         Returns:
             double: The distance between the two points in kilometers.
         """
-        return haversine((lat1, lon1), (lat2, lon2), unit=Unit.KILOMETERS)
+        return haversine((lat1, lon1), (lat2, lon2), unit=Config.DISTANCE_UNIT)   # Use distance unit from Config
 
 
     def __init__(self, spark_session: SparkSession):
@@ -89,7 +91,7 @@ class AnalyzeData:
         Returns:
             DataFrame: A filtered DataFrame containing only rows with valid message types.
         """
-        return  df.filter(col(self.MESSAGE_TYPE).isin(self.DYNAMIC_MSG_TYPES))
+        return  df.filter(col(self.MESSAGE_TYPE).isin(Config.DYNAMIC_MSG_TYPES)) # Use types from Config
 
 
     def calculate_country(self, df: DataFrame) -> DataFrame:
@@ -170,6 +172,6 @@ class AnalyzeData:
         """
         return(df.filter(col(self.SPEED).isNotNull())
                 .groupBy(col(self.MMSI))
-                .agg(round(avg(col(self.SPEED) * self.KNOTS_TO_KMH), 2).alias(self.SPEED_AVG))
+                .agg(round(avg(col(self.SPEED) * Config.SPEED_CONVERSION_FACTOR), 2).alias(self.SPEED_AVG))  # Use factor from Config
                 .orderBy(col(self.SPEED_AVG), ascending=False)
         )

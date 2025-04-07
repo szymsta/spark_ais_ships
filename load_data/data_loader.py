@@ -1,6 +1,7 @@
 from pyspark.sql import SparkSession, DataFrame
 from pyspark.sql.functions import substring, col
 from functools import reduce
+from config import Config
 
 
 class LoadData:
@@ -17,12 +18,15 @@ class LoadData:
         spark_session (SparkSession): The Spark session used for DataFrame operations.
 
     Constants:
-        FILE_NAMES (list): A list of CSV file names to be loaded.
         MMSI (str): The column name for the Maritime Mobile Service Identity.
         MID (str): The column name for the Maritime Identification Digits.
+    
+    Configuration:
+        COnfig.FILE_NAMES (list): The list of CSV file names to be loaded, defined in the config.py file.
+        Config.FILE_FORMAT (str): File format used when reading data (e.g., "csv").
+        Config.FILE_OPTIONS (dict): Dictionary of Spark CSV read options (e.g., header, delimiter).
     """
     
-    FILE_NAMES = ["ais_decoded_message_time.csv", "mid_for_mmsi.csv"]
     MMSI = "mmsi"
     MID = "mid"
 
@@ -47,8 +51,8 @@ class LoadData:
             DataFrame: A DataFrame containing the loaded dataset.
         """
         # Step 1: Create Data Frame
-        df = (self.spark_session.read.format("csv")
-              .options(header=True, inferSchema=True, delimiter=",")
+        df = (self.spark_session.read.format(Config.FILE_FORMAT)    # Use format from Config
+              .options(**Config.FILE_OPTIONS)   # Use options from Config
               .load(file_name))
         
         # Step 2: Extract MID from MMSI if the column exists
@@ -67,5 +71,5 @@ class LoadData:
         Returns:
             DataFrame: A merged DataFrame containing all datasets.
         """
-        dfs = [self.load_datasets(file) for file in self.FILE_NAMES]
+        dfs = [self.load_datasets(file) for file in Config.FILE_NAMES]  # Use file names from config
         return reduce(lambda df1, df2: df1.join(df2, self.MID, "left"), dfs)

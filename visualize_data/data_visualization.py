@@ -1,6 +1,7 @@
 from pyspark.sql import SparkSession, DataFrame
 import plotly.express as px
 import plotly.graph_objects as go
+from config import Config
 
 
 class VisualizeData:
@@ -9,9 +10,17 @@ class VisualizeData:
     The `ships_map` method shows the locations of ships based on their latitude, longitude, and MMSI (Maritime Mobile Service Identity) numbers.
 
     Attributes:
-    LATITUDE (str): The column name for the latitude of the ships.
-    LONGITUDE (str): The column name for the longitude of the ships.
-    MMSI (str): The column name for the Maritime Mobile Service Identity of the ships.
+        spark_session (SparkSession): The Spark session to be used for DataFrame operations.
+    
+    Constants:
+        LATITUDE (str): The column name for the latitude of the ships.
+        LONGITUDE (str): The column name for the longitude of the ships.
+        MMSI (str): The column name for the Maritime Mobile Service Identity of the ships.
+
+    Configuration:
+        Config.MAP_ZOOM (int): The zoom level for the map.
+        Config.MAP_HEIGHT (int): The height of the map.
+        Config.MAP_STYLE (str): The style of the map.
     """
 
     LATITUDE = "lat"
@@ -50,9 +59,9 @@ class VisualizeData:
                                     lat=self.LATITUDE,
                                     lon=self.LONGITUDE,
                                     hover_name=self.MMSI,
-                                    zoom=5,
-                                    height=5000)
-                                    .update_layout(mapbox_style="open-street-map")
+                                    zoom=Config.MAP_ZOOM,   # Use zoom from Config
+                                    height=Config.MAP_HEIGHT)   # Use height from Config
+                                    .update_layout(mapbox_style=Config.MAP_STYLE) # Use mapbox style from Config
         )
 
         # Step 3: Return the map (go.Figure)
