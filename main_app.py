@@ -1,5 +1,4 @@
 # Import libraries
-from pyspark.sql import SparkSession
 import logging
 import webbrowser
 import os
@@ -10,6 +9,7 @@ from clean_data.data_cleaner import CleanData
 from visualize_data.data_visualization import VisualizeData
 from analyse_data.data_analyzer import AnalyzeData
 from search_data.data_searcher import SearchData
+from spark_session_manager import SparkSessionSingleton
 from config import Config
 
 
@@ -26,18 +26,12 @@ logging.basicConfig(
 )
 
 
+# Initialize SparkSession outside of main function (using Singleton)
+spark = SparkSessionSingleton.get_spark_session()
+logging.info("Spark session initialized.")
+
+
 def main():
-
-    # Initialize SparkSession.
-    spark = (
-        SparkSession.builder
-        .appName(Config.SPARK_APP_NAME) # Set the application name
-        .master(Config.SPARK_MASTER)    # Run Spark locally with as many worker threads as there are cores on your machine
-        .getOrCreate()                  # Get or create a Spark session
-        )
-
-    logging.info("Spark session initialized.")
-
 
     # Initialize modules
     try:
