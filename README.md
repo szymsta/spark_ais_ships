@@ -62,7 +62,9 @@ To run the pipeline, execute the **`main_app.py`** script, which initializes a S
 
    - Load and clean the AIS data using modules in the pipeline.
 
-   - Analyze dynamic ship data, including distance and speed calculations.
+   - Analyze dynamic ship data, including distance, country flag and average speed calculations.
+  
+   - Search for ships by MMSI / list MMSIs, geographical location or country flag.
 
    - Visualize ship locations on an interactive map.
 
@@ -82,6 +84,8 @@ Here’s an overview of the project directory:
   │   └── data_searcher.py          # Module for searching specific AIS data
   ├── visualize_data/               # Contains the VisualizeData module
   │   └── data_visualization.py     # Module for visualizing AIS data
+  ├── spark_session_manager/        # Contains the SparkSessionSingleton module
+  │   └── spark_session_manager.py  # Module fo spark session
   ├── config.py                     # Configuration file
   ├── requirements.txt              # Python dependencies
   ├── README.md                     # Project documentation
@@ -98,3 +102,5 @@ Here’s an overview of the project directory:
 4. SearchData: The module provides functionality for searching ships by MMSI or geographical location.
 
 5. VisualizeData: The module is responsible for visualizing the data on a map.
+   
+6. SparkSessionSingleton: The module manages and provides a single SparkSession instance across the application.
