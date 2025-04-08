@@ -43,6 +43,13 @@ class Config:
     LOG_LEVEL = logging.INFO        # Set the log level to INFO (other options could be DEBUG, WARNING, ERROR, etc.)
     LOG_FORMAT = "%(asctime)s - %(levelname)s - %(message)s" # Log format string
     LOG_HANDLERS = [logging.FileHandler(LOG_FILE), logging.StreamHandler()] # Default handlers: to a file and to the console
+    
+    # Search data parameters:
+    TARGET_MMSI = 319205600                     # MMSI number for searching a single ship
+    TARGET_MMSI_LIST = [319205600, 257988000]   # List of MMSI numbers for searching multiple ships
+    LAT_MIN, LAT_MAX = 57.0, 59.0               # Latitude range for searching ships by location
+    LON_MIN, LON_MAX = 4.0, 5.4                 # Longitude range for searching ships by location
+    COUNTRY_FLAG = "Poland (Republic of)"       # Country flag for searching ships by their country of registration
 
     # map name & path - main_app.py
     MAP_OUTPUT_FILE = "ships_map.html"
