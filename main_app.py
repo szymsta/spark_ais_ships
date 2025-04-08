@@ -26,14 +26,13 @@ logging.basicConfig(
 )
 
 
-# Initialize SparkSession outside of main function (using Singleton)
+# Initialize SparkSession (using Singleton)
 spark = SparkSessionSingleton.get_spark_session()
-logging.info("Spark session initialized.")
 
 
 def main():
 
-    # Initialize modules
+    # Initialize data processing modules
     try:
         loader = LoadData(spark)
         cleaner = CleanData(spark)
@@ -50,48 +49,42 @@ def main():
         return
 
 
-    # Load and clean data
+    # Load and clean datasets
     try:
         # Load the data using the loader module
-        logging.info("Loading data...")
         ais_df = loader.join_datasets()
 
         # Clean the loaded data using the cleaner module
-        logging.info("Cleaning data...")
         ais_clean_df = cleaner.clean_dataset(ais_df)
 
         # Notify that data has been processed
-        logging.info("Data loaded and cleaned successfully.")
     
     except Exception as e:
         # Handle errors during data loading or cleaning
-        logging.error(f"Error initializing modules: {e}")
+        logging.error(f"Error loading or cleaning data: {e}")
 
         # Stop Spark session if modules fail to initialize
         spark.stop()    
         return
     
 
-    # Analyze data
+    # Analyze the data
     try:
         # Create a DataFrame with dynamic data
-        logging.info("Filtering df...")
-        dynamic_data = analyzer.calculate_dynamic_data(ais_clean_df)
-        logging.info("DataFrame with dynamic data created")
+        dynamic_data_df = analyzer.calculate_dynamic_data(ais_clean_df)
+
+        # Create a DataFrame grouped by the country
+        country_df = analyzer.calculate_dynamic_data(ais_clean_df)
 
         # Create a DataFrame with distances
-        logging.info("Calculating distances...")
-        distance = analyzer.calculate_distance(dynamic_data)
-        logging.info("DataFrame with distances created")
+        distance_df = analyzer.calculate_distance(dynamic_data_df)
 
         # Create a DataFrame with speed average
-        logging.info("Calculating speed average...")
-        speed_avg = analyzer.calculate_avg_speed(dynamic_data)
-        logging.info("DataFrame with speed average created")
+        speed_avg_df = analyzer.calculate_avg_speed(dynamic_data_df)
 
     except Exception as e:
         # Handle errors during process
-        logging.error(f"Error initializing modules: {e}")
+        logging.error(f"Error during data analysis: {e}")
 
         # Stop Spark session if modules fail to initialize
         spark.stop()    
@@ -100,30 +93,31 @@ def main():
 
     # Search Data
     try:
-        # Create a DataFrame with search MMSI
-        logging.info("Calculating df...")
-        find_mmsi = searcher.search_ship(319205600, dynamic_data)
-        logging.info("DataFrame with provided key_word created")
+        # Create a DataFrame by searching for MMSI (Maritime Mobile Service Identity)
+        find_mmsi_df = searcher.search_ship(Config.TARGET_MMSI, dynamic_data_df)    # Use target from Config
 
-        # Create a DataFrame with searching by location
-        logging.info("Calculating df...")
-        find_ships_by_location = searcher.search_ships_by_location(57.0, 59.0, 4.0, 5.4, dynamic_data)
-        logging.info("DataFrame with provided locations created")
+        # Create a DataFrame by searching for a list of MMSIs from Config
+        find_mmsi_list_df = searcher.search_ships(Config.TARGET_MMSI_LIST, dynamic_data_df) # Use target list from Config
 
-    except:
+        # Create a DataFrame by searching ships within a specific location range
+        find_ships_by_location_df = searcher.search_ships_by_location(Config.LAT_MIN, Config.LAT_MAX, Config.LON_MIN, Config.LON_MAX , dynamic_data_df) # Use target list from Config
+
+        # Create a DataFrame by searching ships by country flag
+        find_ships_by_country_flag_df = searcher.search_ships_by_country_flag(Config.COUNTRY_FLAG, dynamic_data_df)
+
+    except Exception as e:
         # Handle errors during process
-        logging.error(f"Error initializing modules: {e}")
+        logging.error(f"Error during data search: {e}")
 
         # Stop Spark session if modules fail to initialize
         spark.stop()    
         return
     
 
-    # Visualize data on map
+    # Visualize data on a map
     try:
-        # Create clean df with ships data
-        logging.info("Loading map...")
-        ships_map = visualizer.ships_map(find_ships_by_location)
+        # Create a clean DataFrame with ships data
+        ships_map = visualizer.ships_map(find_ships_by_country_flag_df)
 
         # Save the map to an HTML file and open in default browser
         map_path = Config.MAP_OUTPUT_FILE   # Use name & path from Config
@@ -131,11 +125,11 @@ def main():
         webbrowser.open(map_path)
 
         # Notify that map has been open in browser
-        logging.info("The ship map has been successfully loaded and opened in browser")
+        logging.info("The ships map has been successfully loaded and opened in the default browser")
 
     except Exception as e:
         # Handle errors during map visualization
-        logging.error(f"Error initializing modules: {e}")
+        logging.error(f"Error during map visualization: {e}")
 
         # Stop Spark session if modules fail to initialize
         spark.stop()    
