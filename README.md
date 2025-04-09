@@ -89,7 +89,11 @@ Here’s an overview of the project directory:
   ├── config.py                     # Configuration file
   ├── requirements.txt              # Python dependencies
   ├── README.md                     # Project documentation
-  └── mid_for_mmsi.csv              # Contains Maritime Identification Digits (MID) number for ship identification
+  ├── mid_for_mmsi.csv              # Contains Maritime Identification Digits (MID) number for ship identification
+  ├── route_selected_ships_map.html # HTML file containing an interactive map of selected ship routes
+  ├── route_ships_country_map.html  # HTML file containing an interactive map of ships filtered by their country flag
+  ├── route_single_ship_map.html    # HTML file containing an interactive map of a single ship's route
+  └── spark_process                 # Directory containing Spark-related logs
   ```
   ## Modules
 
