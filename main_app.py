@@ -57,8 +57,6 @@ def main():
         # Clean the loaded data using the cleaner module
         ais_clean_df = cleaner.clean_dataset(ais_df)
 
-        # Notify that data has been processed
-    
     except Exception as e:
         # Handle errors during data loading or cleaning
         logging.error(f"Error loading or cleaning data: {e}")
@@ -73,14 +71,20 @@ def main():
         # Create a DataFrame with dynamic data
         dynamic_data_df = analyzer.calculate_dynamic_data(ais_clean_df)
 
-        # Create a DataFrame grouped by the country
-        country_df = analyzer.calculate_dynamic_data(ais_clean_df)
+        # Usage 1 - Create a DataFrame grouped by the country and show top 10 row
+        country_df = analyzer.calculate_country(dynamic_data_df)
+        country_df.show(10)
+        logging.info("Data Frame with top ten country created")
 
-        # Create a DataFrame with distances
+        # Usage 2 - Create a DataFrame with distances and show top 10 row
         distance_df = analyzer.calculate_distance(dynamic_data_df)
+        distance_df.show(10)
+        logging.info("Data Frame with top ten distances created")
 
-        # Create a DataFrame with speed average
+        # Usage 3 - Create a DataFrame with speed average and show top 10 row
         speed_avg_df = analyzer.calculate_avg_speed(dynamic_data_df)
+        speed_avg_df.show(10)
+        logging.info("Data Frame with top ten speed average created")
 
     except Exception as e:
         # Handle errors during process
@@ -91,41 +95,87 @@ def main():
         return
 
 
-    # Search Data
+    # Usage 4 - Create a map with the route for the selected MMSI 
     try:
-        # Create a DataFrame by searching for MMSI (Maritime Mobile Service Identity)
+        # Step 1: Create DataFrame with the selected MMSI
         find_mmsi_df = searcher.search_ship(Config.TARGET_MMSI, dynamic_data_df)    # Use target from Config
 
-        # Create a DataFrame by searching for a list of MMSIs from Config
-        find_mmsi_list_df = searcher.search_ships(Config.TARGET_MMSI_LIST, dynamic_data_df) # Use target list from Config
+        # Step 2: Create a ship route map
+        ship_map_1 = visualizer.ships_map(find_mmsi_df)
 
-        # Create a DataFrame by searching ships within a specific location range
-        find_ships_by_location_df = searcher.search_ships_by_location(Config.LAT_MIN, Config.LAT_MAX, Config.LON_MIN, Config.LON_MAX , dynamic_data_df) # Use target list from Config
+        # Step 3: Assign the output file path to the variable
+        map_path_1 = Config.MAP_OUTPUT_FILE_1   # Use the file name & path defined in Config
 
-        # Create a DataFrame by searching ships by country flag
-        find_ships_by_country_flag_df = searcher.search_ships_by_country_flag(Config.COUNTRY_FLAG, dynamic_data_df)
+        # Step 4: Save the map as an HTML file
+        ship_map_1.write_html(map_path_1)
+
+        # Step 5: Open the saved map in the default web browser
+        webbrowser.open(map_path_1)
+
+        # Log the result
+        logging.info("The map has been generated and opened in the default browser")
 
     except Exception as e:
         # Handle errors during process
-        logging.error(f"Error during data search: {e}")
+        logging.error(f"Error during map generation: {e}")
 
         # Stop Spark session if modules fail to initialize
         spark.stop()    
         return
     
 
-    # Visualize data on a map
+    # Usage 5 - Create a map with the route for the selected location range and country flag
     try:
-        # Create a clean DataFrame with ships data
-        ships_map = visualizer.ships_map(find_ships_by_country_flag_df)
 
-        # Save the map to an HTML file and open in default browser
-        map_path = Config.MAP_OUTPUT_FILE   # Use name & path from Config
-        ships_map.write_html(map_path)
-        webbrowser.open(map_path)
+        # Step 1: Create DataFrame with the selected location and country flag
+        find_ships_by_country_flag_df = searcher.search_ships_by_location(
+                                                Config.LAT_MIN, Config.LAT_MAX,     # Use lat range from Config
+                                                Config.LON_MIN, Config.LON_MAX,     # Use lon range from Config
+                                                (searcher.search_ships_by_country_flag(Config.COUNTRY_FLAG, dynamic_data_df))) # Use country flag from Config
+        
+        # Step 2: Create a ship route map
+        ships_map_2 = visualizer.ships_map(find_ships_by_country_flag_df)
 
-        # Notify that map has been open in browser
-        logging.info("The ships map has been successfully loaded and opened in the default browser")
+        # Step 3: Assign the output file path to the variable
+        map_path_2 = Config.MAP_OUTPUT_FILE_2   # Use the file name & path defined in Config
+
+        # Step 4: Save the map as an HTML file
+        ships_map_2.write_html(map_path_2)
+
+        # Step 5: Open the saved map in the default web browser
+        webbrowser.open(map_path_2)
+
+        # Log the result
+        logging.info("The map has been generated and opened in the default browser")
+
+    except Exception as e:
+        # Handle errors during process
+        logging.error(f"Error during map generation: {e}")
+
+        # Stop Spark session if modules fail to initialize
+        spark.stop()    
+        return
+
+
+    # Usage 6 - Create a map with the route for selected MMSIs
+    try:
+        # Step 1: Create a DataFrame by searching ships by country flag
+        find_selected_mmsi_df = searcher.search_ships(Config.TARGET_MMSI_LIST, dynamic_data_df) # Use mmsi list from Config
+
+        # Step 2: Create a ship route map
+        ships_map_3 = visualizer.ships_map(find_selected_mmsi_df)
+
+        # Step 3: Assign the output file path to the variable
+        map_path_3 = Config.MAP_OUTPUT_FILE_3   # Use the file name & path defined in Config
+
+        # Step 4: Save the map as an HTML file
+        ships_map_3.write_html(map_path_3)
+
+        # Step 5: Open the saved map in the default web browser
+        webbrowser.open(map_path_3)
+
+        # Log the result
+        logging.info("The map has been generated and opened in the default browser")
 
     except Exception as e:
         # Handle errors during map visualization
