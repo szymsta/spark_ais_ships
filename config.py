@@ -25,6 +25,7 @@ class Config:
         DISTANCE_UNIT (Unit): The unit for measuring distance (e.g., kilometers).
         DYNAMIC_MSG_TYPES (list): List of message types associated with dynamic data.
         SPEED_CONVERSION_FACTOR (float): Conversion factor for speed from knots to kilometers per hour.
+        MMSI_VALID_PREFIX_PATTERN (str): Pattern for valid ship MMSI numbers starting with digits 2–7.
         MAP_ZOOM (int): Default zoom level for map visualization.
         MAP_HEIGHT (int): Default height for map visualization.
         MAP_STYLE (str): The style of the map visualization (e.g., "open-street-map").
@@ -77,6 +78,9 @@ class Config:
 
     # Speed conversion factor - data_analyzer.py
     SPEED_CONVERSION_FACTOR = 1.852  # Conversion factor for speed from knots to km/h: 1 knot = 1.852 km/h
+
+    # MMSI validation pattern - data_analyzer.py
+    MMSI_VALID_PREFIX_PATTERN = "^[2-7]"    # valid ship MMSI numbers starting with digits 2–7
 
 
     # Map visualization parameters - data_visualization.py
