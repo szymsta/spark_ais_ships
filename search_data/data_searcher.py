@@ -51,7 +51,7 @@ class SearchData:
         Returns:
             DataFrame: A DataFrame containing the rows where the MMSI matches the provided value.
         """
-        return df.filter(col(self.MMSI).contains(mmsi))
+        return df.filter(col(self.MMSI) == mmsi)
     
 
     def search_ships(self, mmsi_list: list, df: DataFrame) -> DataFrame:
@@ -67,7 +67,7 @@ class SearchData:
             DataFrame: A DataFrame containing the rows where the `mmsi` column matches any of the MMSIs from the provided list.
         """
         # Step 1: Generate search criteria for each MMSI in the list
-        search_criteria = [(col(self.MMSI).isNotNull()).contains(mmsi) for mmsi in mmsi_list]
+        search_criteria = [((col(self.MMSI).isNotNull()) & (col(self.MMSI) == mmsi)) for mmsi in mmsi_list]
 
         # Step 2: Apply logical OR to all search criteria, filter and return the DataFrame
         return (df.filter(reduce(lambda x, y: x | y, search_criteria)))

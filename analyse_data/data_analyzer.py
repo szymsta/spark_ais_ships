@@ -33,6 +33,7 @@ class AnalyzeData:
         Config.DISTANCE_UNIT (Unit): The unit of measurement for distance (e.g., kilometers or miles).
         Config.SPEED_CONVERSION_FACTOR (float): Conversion factor for speed unit (e.g., from knots to kilometers per hour).
         Config.DYNAMIC_MSG_TYPES (list): A list containing the valid message types to filter by.
+        Config.MMSI_VALID_PREFIX_PATTERN (str): Pattern used to filter valid ship MMSI numbers.
     """
 
     MESSAGE_TYPE = "msg_type"
@@ -82,8 +83,8 @@ class AnalyzeData:
 
     def calculate_dynamic_data(self, df: DataFrame) -> DataFrame:
         """
-        Filters the DataFrame to keep only rows with message types that are present in the
-        predefined list of dynamic message types (DYNAMIC_MSG_TYPES).
+        Filters the DataFrame to keep only rows with message types from the predefined list
+        (DYNAMIC_MSG_TYPES) and MMSI numbers starting with the defined pattern (MMSI_VALID_PREFIX_PATTERN).
 
         Args:
             df (DataFrame): The DataFrame containing the raw data to be analyzed.
@@ -91,7 +92,9 @@ class AnalyzeData:
         Returns:
             DataFrame: A filtered DataFrame containing only rows with valid message types.
         """
-        return  df.filter(col(self.MESSAGE_TYPE).isin(Config.DYNAMIC_MSG_TYPES)) # Use types from Config
+        return  df.filter((col(self.MESSAGE_TYPE).isin(Config.DYNAMIC_MSG_TYPES)) & # Use types from Config
+                            (col(self.MMSI).cast("string").rlike(Config.MMSI_VALID_PREFIX_PATTERN)) # Use pattern from Config
+        ) 
 
 
     def calculate_country(self, df: DataFrame) -> DataFrame:
