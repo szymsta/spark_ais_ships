@@ -1,7 +1,7 @@
 import pytest
 from load_data.data_loader import LoadData
 from tests.spark_session_test import spark
-
+from pyspark.sql.functions import length
 
 
 def test_spark_session_creation(spark):
@@ -33,6 +33,7 @@ def test_create_mid(spark):
         - 'mid' column exists in the loaded DataFrame.
         - 15 rows are loaded from the CSV file.
         - one row with 'mid' equal to 232.
+        - 'mid' values have exactly 3 characters.
     """
     # Assign the class to constant
     loader = LoadData(spark)
@@ -40,9 +41,16 @@ def test_create_mid(spark):
     # Create DataFrame
     ais_df = loader.load_datasets("test_file.csv")
 
-    # Tests for 'mid' and row count
-    assert "mid" in ais_df.columns  # The 'mid' column should exist
-    assert ais_df.count() == 15   # We should have some data loaded
+    # Filter rows where the length of 'mid' (cast to string) is not equal to 3
+    mid_length_count = ais_df.filter(
+        (length(ais_df["mid"].cast("string")) != 3)).count()
 
-    # Test for the correctness of 'mid' value
-    assert ais_df.filter(ais_df["mid"] == 232).count() >= 1 # One or more row with 'mid' equal to 232
+    # Test 1: Check if 'mid' column exists and correct number of rows is loaded
+    assert "mid" in ais_df.columns  # The 'mid' column should exist
+    assert ais_df.count() == 15   # Exactly 15 rows should be loaded
+
+    # Test 2: Check for at least one row with 'mid' equal to 232
+    assert ais_df.filter(ais_df["mid"] == 232).count() >= 1 # At least one match expected
+    
+    # Test 3: Ensure all 'mid' values have exactly 3 characters
+    assert mid_length_count == 0
