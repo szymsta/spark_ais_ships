@@ -19,7 +19,7 @@ def cleaned_data(spark, raw_data):
 
 
 # Test clean function
-def test_clean_dataset(cleaned_data):
+def test_clean_dataset_filters_out_invalid_and_null_values(cleaned_data):
     """
     Test the cleaning of raw data using CleanData class.
 
