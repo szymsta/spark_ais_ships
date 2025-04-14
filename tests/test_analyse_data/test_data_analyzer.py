@@ -7,7 +7,7 @@ from analyse_data.data_analyzer import AnalyzeData
 
 
 # Test calculate_country
-def test_calculate_country(spark, cleaned_data):
+def test_calculate_country_returns_expected_countries_and_columns(spark, cleaned_data):
     """
     Test the calculation of the country distribution.
 
@@ -34,7 +34,7 @@ def test_calculate_country(spark, cleaned_data):
 
 
 # Test calculate_dynamic_data
-def test_calculate_dynamic_data(spark, cleaned_data):
+def test_calculate_dynamic_data_returns_only_valid_msg_type_values(spark, cleaned_data):
     """
     Test the calculation of dynamic data by filtering valid message types.
 
