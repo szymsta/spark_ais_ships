@@ -18,7 +18,7 @@ def raw_data(spark):
 
 
 # Test spark session
-def test_spark_session_creation(spark):
+def test_spark_session_is_created_and_valid(spark):
     """
     Test that the Spark session is successfully created.
 
@@ -31,7 +31,7 @@ def test_spark_session_creation(spark):
 
 
 # Test load function
-def test_create_mid(spark, raw_data):
+def test_create_mid_column_with_valid_values(spark, raw_data):
     """
     This test ensures that the 'mid' column is properly generated from the MMSI column.
 
