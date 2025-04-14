@@ -28,6 +28,7 @@ Detailed requirements for specific versions of Apache Spark can be found in the 
   - `pyspark` 3.4.4
   - `haversine` 2.9.0
   - `plotly` 6.0.1
+  - `pytest` 8.3.5
 
 ### Step-by-Step Installation
 
