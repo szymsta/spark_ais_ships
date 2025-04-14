@@ -71,20 +71,14 @@ def main():
         # Create a DataFrame with dynamic data
         dynamic_data_df = analyzer.calculate_dynamic_data(ais_clean_df)
 
-        # Usage 1 - Create a DataFrame grouped by the country and show top 10 row
+        # Usage 1 - Create a DataFrame grouped by the country
         country_df = analyzer.calculate_country(dynamic_data_df)
-        country_df.show(10)
-        logging.info("Data Frame with top ten country created")
 
-        # Usage 2 - Create a DataFrame with distances and show top 10 row
+        # Usage 2 - Create a DataFrame with distances
         distance_df = analyzer.calculate_distance(dynamic_data_df)
-        distance_df.show(10)
-        logging.info("Data Frame with top ten distances created")
 
-        # Usage 3 - Create a DataFrame with speed average and show top 10 row
+        # Usage 3 - Create a DataFrame with speed average
         speed_avg_df = analyzer.calculate_avg_speed(dynamic_data_df)
-        speed_avg_df.show(10)
-        logging.info("Data Frame with top ten speed average created")
 
     except Exception as e:
         # Handle errors during process

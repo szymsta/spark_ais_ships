@@ -67,6 +67,12 @@ To run the pipeline, execute the **`main_app.py`** script, which initializes a S
    - Search for ships by MMSI / list MMSIs, geographical location or country flag.
 
    - Visualize ship locations on an interactive map.
+  
+4. Run the test. To ensure the application behaves as expected, you can run all unit tests using pytest. Open a terminal in the root project directory and execute:
+   ```bash
+   pytest
+   ```
+5. This command will automatically discover and run all tests in the tests/ directory.
 
 ## File Structure
 
@@ -86,6 +92,18 @@ Here’s an overview of the project directory:
   │   └── data_visualization.py     # Module for visualizing AIS data
   ├── spark_session_manager/        # Contains the SparkSessionSingleton module
   │   └── spark_session_manager.py  # Module fo spark session
+  ├── tests/                        # Directory for unit tests
+  │    ├── test_analyse_data/       # Contains test
+  │    |   └── test_data_analyzer.py # Tests for AnalyseData module
+  │    ├── test_clean_data/         # Contains test
+  │    |   └── test_data_cleaner.py # Tests for CleanData module
+  │    ├── test_load_data/          # Contains test
+  |    |   └── test_data_loader.py  # Tests for LoadData module
+  │    ├── test_search_data/        # Contains test
+  │    |    └── test_data_searcher.py # Tests for LoadData module
+  |    ├── spark_session_test.py    # Shared fixture for SparkSession used in multiple test modules
+  |    └── test_file.csv            # Sample CSV file used for testing data loading or transformations
+  │
   ├── config.py                     # Configuration file
   ├── requirements.txt              # Python dependencies
   ├── README.md                     # Project documentation
@@ -93,7 +111,7 @@ Here’s an overview of the project directory:
   ├── route_selected_ships_map.html # HTML file containing an interactive map of selected ship routes
   ├── route_ships_country_map.html  # HTML file containing an interactive map of ships filtered by their country flag
   ├── route_single_ship_map.html    # HTML file containing an interactive map of a single ship's route
-  └── spark_process                 # Directory containing Spark-related logs
+  └── spark_process.log             # Directory containing Spark-related logs
   ```
   ## Modules
 
@@ -108,3 +126,5 @@ Here’s an overview of the project directory:
 5. VisualizeData: The module is responsible for visualizing the data on a map.
    
 6. SparkSessionSingleton: The module manages and provides a single SparkSession instance across the application.
+   
+7. Tests:  Contains unit tests for each core module of the project, organized by functionality.

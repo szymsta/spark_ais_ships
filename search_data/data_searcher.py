@@ -36,7 +36,7 @@ class SearchData:
         Args:
             spark_session (SparkSession): An instance of SparkSession to perform data operations.
         """
-        self.spark_session: spark_session
+        self.spark_session = spark_session
 
 
     def search_ship(self, mmsi: int,  df: DataFrame) -> DataFrame:
