@@ -6,7 +6,7 @@ from search_data.data_searcher import SearchData
 
 
 # Test search_ship - Search by MMSI
-def test_search_ship(spark, cleaned_data):
+def test_search_ship_by_mmsi_returns_correct_ship_data(spark, cleaned_data):
     """
     Verifies that the search_ship method returns the correct ship based on MMSI.
     """
